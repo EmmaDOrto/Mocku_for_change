@@ -12,15 +12,18 @@ def import_and_copy(filename, sheet):
     df = original_df.copy()
     return(df)
 
+def calculate_group_score(element_use, element_coherence, pub_score, jury_score):   
+    u = np.asarray(element_use)
+    c = np.asarray(element_coherence)
+    elements_score = np.sum(u*c)
+    group_score = (2*elements_score + 2*jury_score + pub_score)/5
+    group_score = round (group_score, 2)
+    return(group_score)
 
-def filter_and_count(df, condition):
+# def filter_and_count(df, condition):
        
-    return(df_join)
+#     return(df_join)
 
-
-def calculate_genre_score(element_use, element_coherence, pub_score, jury_score):
-
-    return(genre_score)
 
 def calculate_correlation(x,y):
     N = len(x)
@@ -31,14 +34,14 @@ def calculate_correlation(x,y):
     R = num/den
     return(R)
 
-def graph_plot():
+# def graph_plot():
     
-    return(plot)
+#     return(plot)
 
 
-def animate_plot():
+# def animate_plot():
     
-    return(animated_plot)
+#     return(animated_plot)
 
 
 

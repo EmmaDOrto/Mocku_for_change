@@ -9,7 +9,6 @@ from matplotlib import pyplot as plt
 import functions as f
 
 df = f.import_and_copy("thesis_data", "temi")
-#df = df.fillna('Assente', inplace=True)
 
 
 conditions = {"1": { "description": "Topic present in intention", "code": "Intenzione =='Presente'"}, 
@@ -20,9 +19,34 @@ conditions = {"1": { "description": "Topic present in intention", "code": "Inten
               "6": { "description": "Topic present or slightly present in perception", "code": "Percezione =='Presente'| Percezione =='Debole'"},
              }
 
-index_name = ['G' + str(i) for i in range(1,8)]
-score = pd.Series([1.97, 1.54, 2.93, 4.60, 4.61, 3.46, 4.53], 
-                  index = index_name, name = 'Punteggio')
+groups = []
+G = np.asarray(df.loc[:,"Gruppo"])
+
+for k in range (0,len(G)):
+   if (G[k-1]!= G[k]):
+      groups.append(G[k])
+
+df_elements = f.import_and_copy("Thesis_data", "caratteristiche")
+df_score = f.import_and_copy("Thesis_data", "punteggio")
+df_score = df_score.set_index("Gruppo")
+
+
+genre_score = []
+
+for group in groups:
+    
+    df_elements_filtered = df_elements.query("Gruppo == @group")
+    element_use = df_elements_filtered.loc[:,"Utilizzo"]
+    element_coherence = df_elements_filtered.loc[:,"Coerenza"]
+    pub_score = df_score.loc[group, "Punteggio pubblico"]
+    jury_score = df_score.loc[group, "Punteggio tecnico"]
+    
+    
+    group_score = f.calculate_group_score(element_use, element_coherence, pub_score, jury_score)
+    genre_score.append(group_score)
+    
+
+score = pd.Series(genre_score, index = groups, name = "Punteggio")
 
 
 for key in conditions:
@@ -31,7 +55,7 @@ for key in conditions:
     df_count = df_filtered.groupby(['Gruppo']).count().drop(['Intenzione','Risultato','Percezione'], 
                                                             axis=1).rename(columns={'Tema':'N_temi'})
     df_cond = df_filtered[['Gruppo', 'Tema']].groupby(['Gruppo']).aggregate({'Tema':'/'.join})
-    df_join = pd.concat([df_cond, df_count, score], axis=1, join='inner').reset_index().sort_values('Punteggio')
+    df_join = pd.concat([df_cond, df_count, score], axis=1, join='inner')
     df_join.rename(columns={'index':'Gruppo', 'Tema': 'Tipo'}, inplace=True) 
     
     print(conditions[key]["description"])
@@ -47,7 +71,3 @@ for key in conditions:
    
     R = f.calculate_correlation(x,y)
     print("Correlazione = ",R)
-   
-
-    
-    
