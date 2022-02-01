@@ -3,71 +3,57 @@ Created on Thu Jan 27 10:40:26 2022
 
 @author: Emma
 """
-import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 import functions as f
 
 df = f.import_and_copy("thesis_data", "temi")
+df_elements = f.import_and_copy("thesis_data", "caratteristiche")
+df_score = f.import_and_copy("thesis_data", "punteggio")
+df_score.set_index("Gruppo", inplace= True)
 
-
-conditions = {"1": { "description": "Topic present in intention", "code": "Intenzione =='Presente'"}, 
-              "2": { "description": "Topic present or slightly present in intention", "code": "Intenzione =='Presente'| Intenzione =='Debole'"},
-              "3": { "description": "Topic present in result", "code": "Risultato =='Presente'"},      
-              "4": { "description": "Topic present or slightly present in result", "code": "Risultato =='Presente'| Risultato =='Debole'"},      
-              "5": { "description": "Topic present in perception", "code": "Percezione =='Presente'"},
-              "6": { "description": "Topic present or slightly present in perception", "code": "Percezione =='Presente'| Percezione =='Debole'"},
+conditions = {"Topic present in intention": "Intenzione =='Presente'", 
+              "Topic present or slightly present in intention": "Intenzione =='Presente'| Intenzione =='Debole'",
+              "Topic present in result": "Risultato =='Presente'",      
+              "Topic present or slightly present in result": "Risultato =='Presente'| Risultato =='Debole'",      
+              "Topic present in perception": "Percezione =='Presente'",
+              "Topic present or slightly present in perception": "Percezione =='Presente'| Percezione =='Debole'",
              }
 
-groups = []
-G = np.asarray(df.loc[:,"Gruppo"])
+groups = f.extract_groups_names(df)
 
-for k in range (0,len(G)):
-   if (G[k-1]!= G[k]):
-      groups.append(G[k])
-
-df_elements = f.import_and_copy("Thesis_data", "caratteristiche")
-df_score = f.import_and_copy("Thesis_data", "punteggio")
-df_score = df_score.set_index("Gruppo")
-
-
-genre_score = []
-
-for group in groups:
+genre_scores = []
+for group in groups: 
+    group_score = f.calculate_group_score(df_elements, df_score, group)
+    genre_scores.append(group_score)
     
-    df_elements_filtered = df_elements.query("Gruppo == @group")
-    element_use = df_elements_filtered.loc[:,"Utilizzo"]
-    element_coherence = df_elements_filtered.loc[:,"Coerenza"]
-    pub_score = df_score.loc[group, "Punteggio pubblico"]
-    jury_score = df_score.loc[group, "Punteggio tecnico"]
-    
-    
-    group_score = f.calculate_group_score(element_use, element_coherence, pub_score, jury_score)
-    genre_score.append(group_score)
-    
+score = pd.Series(genre_scores, index = groups, name = "Score")
 
-score = pd.Series(genre_score, index = groups, name = "Punteggio")
-
-
+correlations = []
 for key in conditions:
     
-    df_filtered = df.query(conditions[key]["code"])
-    df_count = df_filtered.groupby(['Gruppo']).count().drop(['Intenzione','Risultato','Percezione'], 
-                                                            axis=1).rename(columns={'Tema':'N_temi'})
-    df_cond = df_filtered[['Gruppo', 'Tema']].groupby(['Gruppo']).aggregate({'Tema':'/'.join})
-    df_join = pd.concat([df_cond, df_count, score], axis=1, join='inner')
-    df_join.rename(columns={'index':'Gruppo', 'Tema': 'Tipo'}, inplace=True) 
+    df_filtered = df.query(conditions[key]) 
+    df_counted = f.count_and_join(df_filtered, score)
+    df_counted.name = (key)
     
-    print(conditions[key]["description"])
-    print(df_join) 
+    print(df_counted.name)
+    print(df_counted) 
 
-
-    x = df_join.loc[:,"Punteggio"]
-    y = df_join.loc[:,"N_temi"]
+    x = df_counted.Score
+    y = df_counted.Count
     plt.scatter(x,y, s=100, c='blue')
-    plt.xlabel('Punteggio di genere',fontsize=12)
-    plt.ylabel('Conteggio temi',fontsize=12)
+    plt.title(df_counted.name)
+    plt.xlabel('Genre score',fontsize=12)
+    plt.ylabel('Topics count',fontsize=12)
+    for i in range(df_counted.shape[0]): 
+        plt.text(x=x[i]+0.1,y=y[i]+0.1,s=df_counted.index[i])
     plt.show()
-   
+    
     R = f.calculate_correlation(x,y)
-    print("Correlazione = ",R)
+    print("Correlation = ", R)
+    correlations.append(R)
+
+conditions_names = list(conditions.keys()) 
+condition_score_correlations = pd.Series(correlations, index = conditions_names, name= "Correlation with Genre score")
+
+print(condition_score_correlations)

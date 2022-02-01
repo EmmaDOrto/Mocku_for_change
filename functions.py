@@ -12,31 +12,48 @@ def import_and_copy(filename, sheet):
     df = original_df.copy()
     return(df)
 
-def calculate_group_score(element_use, element_coherence, pub_score, jury_score):   
-    u = np.asarray(element_use)
-    c = np.asarray(element_coherence)
+def extract_groups_names(df):
+    groups = []
+    G = np.asarray(df.loc[:,"Gruppo"])
+    for i in range (0,len(G)):
+       if (G[i-1]!= G[i]):
+           groups.append(G[i])
+    return(groups)
+
+def calculate_group_score(df_elements, df_score, group):   
+    df_elements_filtered = df_elements.query("Gruppo == @group")
+    
+    el_use = df_elements_filtered.loc[:,"Utilizzo"]
+    el_coh = df_elements_filtered.loc[:,"Coerenza"] 
+    p_score = df_score.loc[group, "Punteggio pubblico"]
+    j_score = df_score.loc[group, "Punteggio tecnico"]
+    
+    u = np.asarray(el_use)
+    c = np.asarray(el_coh)
     elements_score = np.sum(u*c)
-    group_score = (2*elements_score + 2*jury_score + pub_score)/5
+    group_score = (2*elements_score + 2*j_score + p_score)/5
     group_score = round (group_score, 2)
     return(group_score)
 
-# def filter_and_count(df, condition):
-       
-#     return(df_join)
-
+def count_and_join(df, score):
+    df_condition_count = df.groupby(['Gruppo']).count().drop(['Intenzione','Risultato','Percezione'], axis=1)
+    df_condition_count.rename(columns={'Tema':'Count'}, inplace = True)
+      
+    df_topic_count = df[['Gruppo', 'Tema']].groupby(['Gruppo']).aggregate({'Tema':'/'.join})
+      
+    df_join = pd.concat([df_condition_count, df_topic_count, score], axis=1, join='outer')
+    df_join.fillna(0, inplace=True)
+    df_join.rename(columns={'index':'Group', 'Tema': 'Topic type'}, inplace=True) 
+    return(df_join)
 
 def calculate_correlation(x,y):
-    N = len(x)
     x = np.asarray(x)
     y = np.asarray(y)
+    N = len(x)
     num = N*np.sum(x*y) - (np.sum(x) * np.sum(y))
     den = np.sqrt((N*np.sum(x**2) - np.sum(x)**2) * (N * np.sum(y**2) - np.sum(y)**2))
     R = num/den
     return(R)
-
-# def graph_plot():
-    
-#     return(plot)
 
 
 # def animate_plot():
