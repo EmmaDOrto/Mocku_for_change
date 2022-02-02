@@ -7,9 +7,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import functions as f
 
-df = f.import_and_copy("thesis_data", "temi")
-df_elements = f.import_and_copy("thesis_data", "caratteristiche")
-df_score = f.import_and_copy("thesis_data", "punteggio")
+df = f.read_and_check("thesis_data.xlsx", "temi")
+df_elements = f.read_and_check("thesis_data.xlsx", "caratteristiche")
+df_score = f.read_and_check("thesis_data.xlsx", "punteggio")
 df_score.set_index("Gruppo", inplace= True)
 
 conditions = {"Topic present in intention": "Intenzione =='Presente'", 
@@ -18,7 +18,7 @@ conditions = {"Topic present in intention": "Intenzione =='Presente'",
               "Topic present or slightly present in result": "Risultato =='Presente'| Risultato =='Debole'",      
               "Topic present in perception": "Percezione =='Presente'",
               "Topic present or slightly present in perception": "Percezione =='Presente'| Percezione =='Debole'",
-             }
+              }
 
 groups = f.extract_groups_names(df)
 
