@@ -7,12 +7,70 @@ Created on Sat Jan 29 12:40:05 2022
 import pandas as pd
 import numpy as np
 
-def import_and_copy(filename, sheet):
-    original_df = pd.read_excel(filename + ".xlsx", sheet_name=sheet)
-    df = original_df.copy()
-    return(df)
+
+class WrongColumnsName(Exception):
+    """Exception raised in read_and_chek function when dataframe columns are wrong"""
+
+def read_and_check(filename, sheet):
+    """
+    This function read the data file and check if it is has a proper format.
+
+    Parameters
+    ----------
+    filename : str
+        Path of a dataframe file with .xlsx extension.
+    sheet : str
+        Sheet name, it must be among 'temi', 'caratteristiche' and 'punteggio'.
+
+    Returns
+    -------
+    DataFrame
+
+    """  
+    possible_sheets = ['temi', 'caratteristiche','punteggio']
+    topic_possible_columns = ['Gruppo','Tema','Intenzione', 'Risultato', 'Percezione']
+    elements_possible_columns = ['Gruppo', 'Elemento caratteristico', 'Utilizzo', 'Coerenza']
+    score_possible_columns = ['Gruppo', 'Punteggio tecnico', 'Punteggio pubblico']
+    
+    if ".xlsx" not in filename: 
+        raise ValueError("Sorry, data files must have .xlsx extension.")     
+    if sheet not in possible_sheets:
+        raise ValueError("Sorry, sheet name must be among 'temi', 'caratteristiche' and 'punteggio'. It is case sensitive.")
+    else:
+        original_df = pd.read_excel(filename, sheet_name=sheet) 
+        if (sheet == "temi") and \
+            (all([c in original_df.columns for c in topic_possible_columns])): 
+                df = original_df.copy()
+                df.name = "topics"
+                return df
+        elif (sheet == "caratteristiche") and \
+              (all([c in original_df.columns for c in elements_possible_columns])): 
+                df = original_df.copy()
+                df.name = "elements"
+                return df  
+        elif (sheet == "punteggio") and \
+              (all([c in original_df.columns for c in score_possible_columns])): 
+                df = original_df.copy()
+                df.name = "score"
+                return df 
+        else:
+              raise WrongColumnsName("Sorry, columns names are not as expected.") 
+    
 
 def extract_groups_names(df):
+    """"This funcion get a dataframe, check the column named "group" and
+    iterate through its elements to return a list with all the different 
+    names of groups.
+    
+    Parameters
+    ----------
+    df : dataframe
+
+    Returns
+    -------
+    list
+    
+    """
     groups = []
     G = np.asarray(df.loc[:,"Gruppo"])
     for i in range (0,len(G)):
