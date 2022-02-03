@@ -7,20 +7,21 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import functions as f
 
-df = f.read_and_check("thesis_data.xlsx", "temi")
-df_elements = f.read_and_check("thesis_data.xlsx", "caratteristiche")
-df_score = f.read_and_check("thesis_data.xlsx", "punteggio")
-df_score.set_index("Gruppo", inplace= True)
+df = f.read_and_check("thesis_data.xlsx", "topics")
+df_elements = f.read_and_check("thesis_data.xlsx", "elements")
+df_score = f.read_and_check("thesis_data.xlsx", "score")
+df_score.set_index("Group", inplace= True)
 
-conditions = {"Topic present in intention": "Intenzione =='Presente'", 
-              "Topic present or slightly present in intention": "Intenzione =='Presente'| Intenzione =='Debole'",
-              "Topic present in result": "Risultato =='Presente'",      
-              "Topic present or slightly present in result": "Risultato =='Presente'| Risultato =='Debole'",      
-              "Topic present in perception": "Percezione =='Presente'",
-              "Topic present or slightly present in perception": "Percezione =='Presente'| Percezione =='Debole'",
+
+conditions = {"Topic present in intention": "Intention =='Present'", 
+              "Topic present or slightly present in intention": "Intention =='Present'| Intention =='Slightly'",
+              "Topic present in result": "Result =='Present'",      
+              "Topic present or slightly present in result": "Result =='Present'| Result =='Slightly'",      
+              "Topic present in perception": "Perception =='Present'",
+              "Topic present or slightly present in perception": "Perception =='Present'| Perception =='Slightly'",
               }
 
-groups = f.extract_groups_names(df)
+groups = f.extract_group_names(df)
 
 genre_scores = []
 for group in groups: 

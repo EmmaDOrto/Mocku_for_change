@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 
-class WrongColumnsName(Exception):
+class WrongColumnNames(Exception):
     """Exception raised in read_and_chek function when dataframe columns are wrong"""
 
 def read_and_check(filename, sheet):
@@ -20,71 +20,89 @@ def read_and_check(filename, sheet):
     filename : str
         Path of a dataframe file with .xlsx extension.
     sheet : str
-        Sheet name, it must be among 'temi', 'caratteristiche' and 'punteggio'.
+        Sheet name, it must be among 'topics', 'elements' and 'score'.
 
     Returns
     -------
-    DataFrame
+    df : DataFrame
 
     """  
-    possible_sheets = ['temi', 'caratteristiche','punteggio']
-    topic_possible_columns = ['Gruppo','Tema','Intenzione', 'Risultato', 'Percezione']
-    elements_possible_columns = ['Gruppo', 'Elemento caratteristico', 'Utilizzo', 'Coerenza']
-    score_possible_columns = ['Gruppo', 'Punteggio tecnico', 'Punteggio pubblico']
+    possible_sheets = ['topics', 'elements','score']
+    topic_possible_columns = ['Group','Topic','Intention', 'Result', 'Perception']
+    elements_possible_columns = ['Group', 'Typical element', 'Use', 'Coherence']
+    score_possible_columns = ['Group', 'Jury score', 'Audience score']
     
     if ".xlsx" not in filename: 
         raise ValueError("Sorry, data files must have .xlsx extension.")     
     if sheet not in possible_sheets:
-        raise ValueError("Sorry, sheet name must be among 'temi', 'caratteristiche' and 'punteggio'. It is case sensitive.")
+        raise ValueError("Sorry, sheet name must be among 'topics', 'elements' and 'score'. It is case sensitive.")
     else:
         original_df = pd.read_excel(filename, sheet_name=sheet) 
-        if (sheet == "temi") and \
+        if (sheet == "topics") and \
             (all([c in original_df.columns for c in topic_possible_columns])): 
                 df = original_df.copy()
                 df.name = "topics"
                 return df
-        elif (sheet == "caratteristiche") and \
+        elif (sheet == "elements") and \
               (all([c in original_df.columns for c in elements_possible_columns])): 
                 df = original_df.copy()
                 df.name = "elements"
                 return df  
-        elif (sheet == "punteggio") and \
+        elif (sheet == "score") and \
               (all([c in original_df.columns for c in score_possible_columns])): 
                 df = original_df.copy()
                 df.name = "score"
                 return df 
         else:
-              raise WrongColumnsName("Sorry, columns names are not as expected.") 
+              raise WrongColumnNames("Sorry, columns names are not as expected.") 
     
 
-def extract_groups_names(df):
+def extract_group_names(df):
     """"This funcion get a dataframe, check the column named "group" and
     iterate through its elements to return a list with all the different 
     names of groups.
     
     Parameters
     ----------
-    df : dataframe
+    df : DataFrame
 
     Returns
     -------
-    list
+    group_names : list
     
     """
-    groups = []
-    G = np.asarray(df.loc[:,"Gruppo"])
-    for i in range (0,len(G)):
-       if (G[i-1]!= G[i]):
-           groups.append(G[i])
-    return(groups)
-
-def calculate_group_score(df_elements, df_score, group):   
-    df_elements_filtered = df_elements.query("Gruppo == @group")
     
-    el_use = df_elements_filtered.loc[:,"Utilizzo"]
-    el_coh = df_elements_filtered.loc[:,"Coerenza"] 
-    p_score = df_score.loc[group, "Punteggio pubblico"]
-    j_score = df_score.loc[group, "Punteggio tecnico"]
+    group_names = []
+    G = np.asarray(df.loc[:,"Group"])
+    for x in G: 
+        if x not in group_names:
+            group_names.append(x)
+    return(group_names)
+    
+
+def calculate_group_score(df_elements, df_score, group): 
+    
+    """
+    Parameters
+    ----------
+    df_elements : DataFrame
+        
+    df_score : DataFrame
+        
+    group : str
+
+    Returns
+    -------
+    group_score : numpy.float64
+            Value between 0 and 5.
+    
+    """
+    df_elements_filtered = df_elements.query("Group == @group")
+    
+    el_use = df_elements_filtered.loc[:,"Use"]
+    el_coh = df_elements_filtered.loc[:,"Coherence"] 
+    p_score = df_score.loc[group, "Audience score"]
+    j_score = df_score.loc[group, "Jury score"]
     
     u = np.asarray(el_use)
     c = np.asarray(el_coh)
@@ -94,17 +112,41 @@ def calculate_group_score(df_elements, df_score, group):
     return(group_score)
 
 def count_and_join(df, score):
-    df_condition_count = df.groupby(['Gruppo']).count().drop(['Intenzione','Risultato','Percezione'], axis=1)
-    df_condition_count.rename(columns={'Tema':'Count'}, inplace = True)
+    """
+    This function gets a filtered by condition dataframe and counts 
+    how now many topics (and of which type) fulfill that condition. 
+    
+    
+    """
+    df_condition_count = df.groupby(['Group']).count()
+    df_condition_count = df_condition_count.drop(['Intention','Result','Perception'], axis=1)
+    df_condition_count.rename(columns={'Topic':'Count'}, inplace = True)
       
-    df_topic_count = df[['Gruppo', 'Tema']].groupby(['Gruppo']).aggregate({'Tema':'/'.join})
+    df_topic_count = df[['Group', 'Topic']].groupby(['Group']).aggregate({'Topic':'/'.join})
       
     df_join = pd.concat([df_condition_count, df_topic_count, score], axis=1, join='outer')
     df_join.fillna(0, inplace=True)
-    df_join.rename(columns={'index':'Group', 'Tema': 'Topic type'}, inplace=True) 
+    df_join.rename(columns={'index':'Group', 'Topic': 'Topic type'}, inplace=True) 
     return(df_join)
 
 def calculate_correlation(x,y):
+    """
+    This function calculate the pearson coefficent of correlation between sets x and y.
+
+    Parameters
+    ----------
+    x : numpy.array
+        Its lenght must be same as y.
+        
+    y : numpy.array
+        Its lenght must be same as x.
+    
+    Returns
+    -------
+    R : numpy.float64
+        Value between -1 and 1.
+
+    """
     x = np.asarray(x)
     y = np.asarray(y)
     N = len(x)
@@ -113,10 +155,6 @@ def calculate_correlation(x,y):
     R = num/den
     return(R)
 
-
-# def animate_plot():
-    
-#     return(animated_plot)
 
 
 
