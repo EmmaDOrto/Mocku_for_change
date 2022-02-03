@@ -19,6 +19,7 @@ def read_and_check(filename, sheet):
     ----------
     filename : str
         Path of a dataframe file with .xlsx extension.
+    
     sheet : str
         Sheet name, it must be among 'topics', 'elements' and 'score'.
 
@@ -83,13 +84,20 @@ def extract_group_names(df):
 def calculate_group_score(df_elements, df_score, group): 
     
     """
+    This function get the two dataframe with the needed info
+    and the name of the group and calculate the group score value.
+    
+    
     Parameters
     ----------
     df_elements : DataFrame
-        
+        It must contains following columns: Group, Use, Coherence.
+    
     df_score : DataFrame
-        
+        It must contains following columns: Group, Audience score, Jury score.
+    
     group : str
+       Must be among 'Group' column elements from both df_elements and df_score.
 
     Returns
     -------
@@ -111,21 +119,27 @@ def calculate_group_score(df_elements, df_score, group):
     group_score = round (group_score, 2)
     return(group_score)
 
-def count_and_join(df, score):
+def count_fulfillments(df):
     """
     This function gets a filtered by condition dataframe and counts 
-    how now many topics (and of which type) fulfill that condition. 
+    how many topics (and of which type) fulfill that condition. 
     
+    Parameters
+    ----------
+    df : DataFrame
+        
+    Returns
+    -------
+    df_join : Dataframe
     
     """
-    df_condition_count = df.groupby(['Group']).count()
-    df_condition_count = df_condition_count.drop(['Intention','Result','Perception'], axis=1)
-    df_condition_count.rename(columns={'Topic':'Count'}, inplace = True)
+    df_count = df.groupby(['Group']).count()
+    df_count = df_count.drop(['Intention','Result','Perception'], axis=1)
+    df_count.rename(columns={'Topic':'Count'}, inplace = True)
       
-    df_topic_count = df[['Group', 'Topic']].groupby(['Group']).aggregate({'Topic':'/'.join})
+    df_topic_type = df[['Group', 'Topic']].groupby(['Group']).aggregate({'Topic':'/'.join})
       
-    df_join = pd.concat([df_condition_count, df_topic_count, score], axis=1, join='outer')
-    df_join.fillna(0, inplace=True)
+    df_join = pd.concat([df_count, df_topic_type], axis=1, join='inner')
     df_join.rename(columns={'index':'Group', 'Topic': 'Topic type'}, inplace=True) 
     return(df_join)
 

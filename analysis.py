@@ -34,24 +34,30 @@ correlations = []
 for key in conditions:
     
     df_filtered = df.query(conditions[key]) 
-    df_counted = f.count_and_join(df_filtered, score)
-    df_counted.name = (key)
     
-    print(df_counted.name)
-    print(df_counted) 
+    df_counted = f.count_fulfillments(df_filtered)
+    
+    df_final = pd.concat([df_counted, score], axis=1, join='outer')
+    df_final.fillna(0, inplace=True)
+    
+    df_final.name = (key)
+    
+    print(df_final.name)
+    print(df_final) 
 
-    x = df_counted.Score
-    y = df_counted.Count
+    x = df_final.Score
+    y = df_final.Count
     plt.scatter(x,y, s=100, c='blue')
-    plt.title(df_counted.name)
+    plt.title(df_final.name)
     plt.xlabel('Genre score',fontsize=12)
     plt.ylabel('Topics count',fontsize=12)
-    for i in range(df_counted.shape[0]): 
-        plt.text(x=x[i]+0.1,y=y[i]+0.1,s=df_counted.index[i])
+    for i in range(df_final.shape[0]): 
+        plt.text(x=x[i]+0.1,y=y[i]+0.1,s=df_final.index[i])
     plt.show()
     
     R = f.calculate_correlation(x,y)
     print("Correlation = ", R)
+    print("----------------------------------------------------------------")
     correlations.append(R)
 
 conditions_names = list(conditions.keys()) 
