@@ -13,8 +13,8 @@ Is the mockumentary genre able to inspire and help students telling about Climat
 
 Each group of students made a video, for each of those 7 videos I collected two kind of data that are related to this analysis. They are about:
 
-- how many topics have been addressed in the video:
-- how much the video is coherent with the mockumentary genre style:
+- how many topics have been addressed in the video,
+- how much the video is coherent with the mockumentary genre style.
 
 Data are stored in an .xlsx file (more info about the structure of this file will be discussed ahead).
 
