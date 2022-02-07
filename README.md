@@ -36,11 +36,12 @@ J_score is the score given by a jury of experts; a_score is the score given by a
 
 - The file [thesis_data](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/thesis_data.xlsx) it's a .xlsx file that is imported in analysis file. It has three different sheets. The first one is called "topics" and contains data about topics addressment for each group. The second and the third, called respectively "lelements" and "score", contain data needed to calculate genre score for each group. 
 
-- In the file [analysis](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/analysis.py) there is the main part of the code, where the data file and function file are imported to perform the data analysis.
+- In the file [analysis](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/analysis.py) there is the main part of the code, where the data file and function file are imported. For each group it calculates a group score, then it counts topics that fulfill a certain condition (For example "Topic present in results" or "Topic present or slightly present in perception") and finally calculate correlation beetween conditions and genre scores and visualize the related scatter plot.
 
 - In the file [test](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/test.py) I have tested all the functions in functions file to ensure that they work properly.
 
 - In the repository [testing_files](https://github.com/EmmaDOrto/Mocku_for_change/tree/main/testing_files) there are two files (a .csv and a .xlsx) imported in the test file. They must never be changed.
 
 To show you some results, those are the final dataframe an related plot for the condition "Topic present or slightly present in perception": 
+
 ![plot_image](https://github.com/EmmaDOrto/Mocku_for_change_data_analisys/blob/main/plot_image.png)
