@@ -53,6 +53,7 @@ def read_and_check(filename, sheet):
               (all([c in original_df.columns for c in score_possible_columns])): 
                 df = original_df.copy()
                 df.name = "score"
+                df.rename(columns={'index':'Group'})
                 return df 
         else:
               raise WrongColumnNames("Sorry, columns names are not as expected.") 
@@ -76,8 +77,9 @@ def extract_group_names(df):
     group_names = []
     G = np.asarray(df.loc[:,"Group"])
     for x in G: 
-        if x not in group_names:
-            group_names.append(x)
+        if x and x.lower() and x.upper() and x.capitalize() not in group_names:
+            group_names.append(x.capitalize())
+    group_names = sorted(group_names)
     return(group_names)
     
 
@@ -105,8 +107,8 @@ def calculate_group_score(df_elements, df_score, group):
             Value between 0 and 5.
     
     """
-    df_elements_filtered = df_elements.query("Group == @group")
-    
+    df_elements_filtered = df_elements[df_elements.Group == group]
+
     el_use = df_elements_filtered.loc[:,"Use"]
     el_coh = df_elements_filtered.loc[:,"Coherence"] 
     p_score = df_score.loc[group, "Audience score"]
@@ -115,7 +117,7 @@ def calculate_group_score(df_elements, df_score, group):
     u = np.asarray(el_use)
     c = np.asarray(el_coh)
     elements_score = np.sum(u*c)
-    group_score = (2*elements_score + 2*j_score + p_score)/5
+    group_score = (3*j_score + elements_score + p_score)/5
     group_score = round (group_score, 2)
     return(group_score)
 
@@ -135,12 +137,13 @@ def count_fulfillments(df):
     """
     df_count = df.groupby(['Group']).count()
     df_count = df_count.drop(['Intention','Result','Perception'], axis=1)
-    df_count.rename(columns={'Topic':'Count'}, inplace = True)
+    df_count.rename(columns={'Topic':"Count"}, inplace = True)
       
     df_topic_type = df[['Group', 'Topic']].groupby(['Group']).aggregate({'Topic':'/'.join})
       
     df_join = pd.concat([df_count, df_topic_type], axis=1, join='inner')
     df_join.rename(columns={'index':'Group', 'Topic': 'Topic type'}, inplace=True) 
+    
     return(df_join)
 
 def calculate_correlation(x,y):
