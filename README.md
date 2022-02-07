@@ -44,4 +44,18 @@ J_score is the score given by a jury of experts; a_score is the score given by a
 
 To show you some results, those are the final dataframe an related plot for the condition "Topic present or slightly present in perception": 
 
+
+Topic present or slightly present in perception
+    Count                                         Topic type  Score
+G1     10  Solutions/Relationships/Choices/Collectivity/F...   1.76
+G2     10  Reality/Complexity/Solutions/Relationships/Cho...   2.75
+G3      7  Solutions/Collectivity/Future/Possible scenari...   2.20
+G4     15  Reality/Complexity/Circular causality/Data/Cho...   3.64
+G5     15  Reality/Complexity/Solutions/Relationships/Cho...   4.15
+G6     12  Reality/Complexity/Data/Relationships/Choices/...   2.95
+G7     12  Reality/Complexity/Data/Solutions/Relationship...   4.25
+R =  0.77
+R^2 =  0.59
+
+
 ![plot_image](https://github.com/EmmaDOrto/Mocku_for_change_data_analisys/blob/main/plot_image.png)
