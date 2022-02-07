@@ -41,3 +41,5 @@ J_score is the score given by a jury of experts; a_score is the score given by a
 - In the file [test](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/test.py) I have tested all the functions in functions file to ensure that they work properly.
 
 - In the repository [testing_files](https://github.com/EmmaDOrto/Mocku_for_change/tree/main/testing_files) there are two files (a .csv and a .xlsx) imported in the test file. They must never be changed.
+
+To show you some results, those are the final dataframe an related plot for the condition "Topic present or slightly present in perception": ![plot_image](https://github.com/EmmaDOrto/Mocku_for_change_data_analisys/blob/main/plot_image.png)
