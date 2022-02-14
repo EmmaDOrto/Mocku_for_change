@@ -11,7 +11,7 @@ My main goal is to understand if this genre can be useful to overcome the “ima
 The project in this repository is meant for analysing and visualising the part of my thesis data related to this research question:
 Is the mockumentary genre able to inspire and help students telling about Climate Change main (sub)topics?
 
-Each group of students made a video, for each of those 7 videos I collected two kind of data that are related to this analysis. They are about:
+Each group of students made a video, for each of those 7 videos I collected two types of data that are related to this analysis. They are about:
 
 - how many topics have been addressed in the video,
 - how much the video is coherent with the mockumentary genre style.
@@ -20,7 +20,7 @@ Data are stored in an .xlsx file (more info about the structure of this file wil
 
 ## Topics
 
-Three levels have been taken into consideration for topics: Intention, Reality and Perception. At each of this levels a topic can be "present" or "slightly present".  
+Three levels have been taken into consideration for topics: Intention, Reality and Perception. At each of this levels a topic can be absent, "present" or "slightly present".  
 
 ## Genre score
 
@@ -28,15 +28,15 @@ To each video I attributed a Genre Score, calculated by this formula:
 
 Genre Score = (2*j_score + 2*e_score + a_score)/5
 
-J_score is the score given by a jury of experts; a_score is the score given by an audience and finally e_score is a score that take into consideration how many of the 5 typycal elements of the genre were used and if each of them was coherent: it is calculaed as: sum(element_use*element_coherence). J_score, a_score and e_score are numbers beetween 0 and 5, element_use and element_coherence are either 0 (topic not used/not coherent) or 1 (udes/coherent).
+J_score is the score given by a jury of experts; a_score is the score given by an audience and finally e_score is a score that take into consideration how many of the 5 typycal elements of the genre were used and if each of them was coherent. It is calculaed as: sum(element_use*element_coherence). J_score, a_score and e_score are numbers beetween 0 and 5, element_use and element_coherence are either 0 (topic not used/not coherent) or 1 (udes/coherent).
 
 ### The program is divided into the following files:
 
 - In the file [funtions](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/functions.py) I have built the functions that do the main calculations.
 
-- The file [thesis_data](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/thesis_data.xlsx) it's a .xlsx file that is imported in analysis file. It has three different sheets. The first one is called "topics" and contains data about topics addressment for each group. The second and the third, called respectively "lelements" and "score", contain data needed to calculate genre score for each group. 
+- The file [thesis_data](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/thesis_data.xlsx) it's a .xlsx file that is imported in analysis file. It has three different sheets. The first one is called "topics" and contains data about topics addressment for each group. The second and the third, called respectively "elements" and "score", contain data needed to calculate genre score for each group. 
 
-- In the file [analysis](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/analysis.py) there is the main part of the code, where the data file and function file are imported. For each group it calculates a group score, then it counts topics that fulfill a certain condition (For example "Topic present in results" or "Topic present or slightly present in perception") and finally calculate correlation beetween conditions and genre scores and visualize the related scatter plot.
+- In the file [analysis](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/analysis.py) there is the main part of the code, where the data file and function file are imported. For each group it calculates a group score, then it counts topics that fulfil certain conditions (For example "Topic present in results" or "Topic present or slightly present in perception") and finally it calculates correlation beetween conditions and genre scores and visualizes the related scatter plot.
 
 - In the file [test](https://github.com/EmmaDOrto/Mocku_for_change/blob/main/test.py) I have tested all the functions in functions file to ensure that they work properly.
 
