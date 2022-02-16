@@ -53,7 +53,8 @@ def read_and_check(filename, sheet):
               (all([c in original_df.columns for c in score_possible_columns])): 
                 df = original_df.copy()
                 df.name = "score"
-                df.rename(columns={'index':'Group'})
+                df.set_index("Group", inplace= True)
+                df.index.name = "Group"
                 return df 
         else:
               raise WrongColumnNames("Sorry, columns names are not as expected.") 
@@ -74,11 +75,8 @@ def extract_group_names(df):
     
     """
     
-    group_names = []
     G = np.asarray(df.loc[:,"Group"])
-    for x in G: 
-        if x and x.lower() and x.upper() and x.capitalize() not in group_names:
-            group_names.append(x.capitalize())
+    group_names = {x.capitalize() for x in G} 
     group_names = sorted(group_names)
     return(group_names)
     

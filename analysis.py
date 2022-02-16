@@ -10,7 +10,6 @@ import functions as f
 df = f.read_and_check("thesis_data.xlsx", "topics")
 df_elements = f.read_and_check("thesis_data.xlsx", "elements")
 df_score = f.read_and_check("thesis_data.xlsx", "score")
-df_score.set_index("Group", inplace= True)
 
 
 conditions = {"Topic present in intention": "Intention =='Present'", 
