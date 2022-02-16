@@ -1,0 +1,11 @@
+[paths]
+analysis_results: ./analysis_results.xlsx
+
+plot1: ./images/pres_intention.png
+plot2: ./images/pres_slipres_intention.png
+plot3: ./images/pres_result.png
+plot4: ./images/pres_slipres_result.png
+plot5: ./images/pres_perception.png
+plot6: ./images/pres_slipres_perception.png
+plot7: ./images/pres_intention_result_perception.png
+plot8: ./images/pres_slipres_intention_result_perception.png

@@ -6,6 +6,26 @@ Created on Thu Jan 27 10:40:26 2022
 import pandas as pd
 from matplotlib import pyplot as plt
 import functions as f
+import sys
+import configparser
+import os
+
+file_name = sys.argv[1]
+config = configparser.ConfigParser()
+config.read(sys.argv[2])
+
+results_path = config.get('paths','analysis_results')
+
+dest1 = config.get('paths','plot1')
+dest2 = config.get('paths','plot2')
+dest3 = config.get('paths','plot3')
+dest4 = config.get('paths','plot4')
+dest5 = config.get('paths','plot5')
+dest6 = config.get('paths','plot6')
+dest7 = config.get('paths','plot7')
+dest8 = config.get('paths','plot8')
+
+plot_destinations = [dest1, dest2, dest3, dest4, dest5, dest6, dest7, dest8]
 
 df = f.read_and_check("thesis_data.xlsx", "topics")
 df_elements = f.read_and_check("thesis_data.xlsx", "elements")
@@ -33,7 +53,7 @@ score = pd.Series(genre_scores, index = groups, name = "Score")
 
 correlations = []
 correlations_squared = []
-for key in conditions:
+for key,destination in zip(conditions,plot_destinations):
     
     df_filtered = df.query(conditions[key]) 
     
@@ -44,8 +64,12 @@ for key in conditions:
     
     df_final_name = (key)
     
-    print(df_final_name)
-    print(df_final)
+    if not os.path.exists(results_path):
+        df_final.to_excel(results_path, sheet_name = df_final_name, index=True)
+
+    else:
+        with pd.ExcelWriter(results_path, engine='openpyxl', if_sheet_exists='replace', mode='a') as writer:
+            df_final.to_excel(writer, sheet_name=df_final_name, index=True)
 
     x = df_final.Score
     y = df_final.Count
@@ -55,12 +79,10 @@ for key in conditions:
     plt.ylabel('Topics count',fontsize=12)
     for i in range(df_final.shape[0]): 
         plt.text(x=x[i]+0.1,y=y[i]+0.1,s=df_final.index[i])
-    plt.show()
+    plt.savefig(destination)
+    plt.close()
     
     R = f.calculate_correlation(x,y)
-    print("R = ", round(R,2))
-    print("R^2 = ", round(R**2, 2))
-    print("----------------------------------------------------------------")
     correlations.append(round(R,2))
     correlations_squared.append(round(R**2, 2))
 
@@ -68,6 +90,5 @@ conditions_names = list(conditions.keys())
 condition_score_correlations = pd.DataFrame(list(zip(correlations, correlations_squared)), index = conditions_names,
                columns =['Pearson coefficient', 'R^2']).sort_values("R^2", ascending=False)
                                             
-
-print(condition_score_correlations)
-#condition_score_correlations.to_excel("D:\TESI\correlation.xlsx")
+with pd.ExcelWriter(results_path, engine='openpyxl', if_sheet_exists='replace', mode='a') as writer:
+    condition_score_correlations.to_excel(writer, sheet_name= "condition-score correlations", index=True)
