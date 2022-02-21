@@ -27,9 +27,9 @@ dest8 = config.get('paths','plot8')
 
 plot_destinations = [dest1, dest2, dest3, dest4, dest5, dest6, dest7, dest8]
 
-df = f.read_and_check("thesis_data.xlsx", "topics")
-df_elements = f.read_and_check("thesis_data.xlsx", "elements")
-df_score = f.read_and_check("thesis_data.xlsx", "score")
+df = f.read_and_check(file_name, "topics")
+df_elements = f.read_and_check(file_name, "elements")
+df_score = f.read_and_check(file_name, "score")
 
 
 conditions = {"Topic present in intention": "Intention =='Present'", 
